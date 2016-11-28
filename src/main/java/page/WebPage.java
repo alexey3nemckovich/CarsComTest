@@ -1,65 +1,45 @@
 package page;
 
+import browser.Browser;
 import element.NavigationBar;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import test.CarsTest;
+import wait.Waits;
 
 public abstract class WebPage {
 
-    private static ExpectedCondition<Boolean> waitJSToLoadCondition;
-    private static ExpectedCondition<Boolean> waitJQueryToLoadCondition;
-    private static WebDriverWait driverWait;
-    //private String url;
+    private String url;
     public NavigationBar navigationBar;
 
-    {
-        driverWait = CarsTest.driverWait;
-        waitJSToLoadCondition = new ExpectedCondition<Boolean>() {
-            public Boolean apply(WebDriver webD) {
-                Object scriptRes = ((JavascriptExecutor) webD).executeScript("return document.readyState");
-                return scriptRes.equals("complete");
-            }
-        };
-        waitJQueryToLoadCondition = new ExpectedCondition<Boolean>() {
-            public Boolean apply(WebDriver webD) {
-                try {
-                    return ((Long)((JavascriptExecutor)webD).executeScript("return jQuery.active") == 0);
-                }
-                catch (Exception e) {
-                    // no jQuery present
-                    return true;
-                }
-            }
-        };
-    }
-
     public WebPage(String url) {
-        if (!url.equals(CarsTest.driver.getCurrentUrl())){
-            open(url);
+        this.url = url;
+        if (!url.equals(Browser.driver.getCurrentUrl())){
+            open();
         }
         else{
-            setUrl(url);
+            initElements();
         }
+    }
+
+    public WebPage(){
+        this.url = Browser.driver.getCurrentUrl();
+        initElements();
     }
 
     private void waitToLoad() {
-        driverWait.until(
-                waitJSToLoadCondition
-        );
+        for(int i = 0; i < 100; i++) {
+            Waits.waitAllJQueryRequest();
+            Waits.waitAllJSRequests();
+        }
     }
 
-    private void setUrl(String url){
+    private void initElements(){
         waitToLoad();
-        //this.url = url;
         navigationBar = new NavigationBar();
     }
 
-    private void open(String url) {
-        CarsTest.driver.get(url);
-        setUrl(url);
+    public void open() {
+        Browser.openPage(url);
+        initElements();
     }
 
 }

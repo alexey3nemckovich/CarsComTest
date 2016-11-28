@@ -8,8 +8,7 @@ public class ResearchCarsPage extends WebPage {
     public ShowCarTypesBtn showCarTypesBtn;
     public CarTypesContainer carTypesContainer;
 
-    public ResearchCarsPage(String url){
-        super(url);
+    public ResearchCarsPage(){
         showCarTypesBtn = new ShowCarTypesBtn();
         carTypesContainer = new CarTypesContainer();
     }
